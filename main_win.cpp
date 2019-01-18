@@ -8,6 +8,9 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include <sstream>
 
@@ -29,6 +32,8 @@ Main_Window::Main_Window()
 
     connect(d_query_input, &QLineEdit::editingFinished,
             this, &Main_Window::search);
+    connect(d_search_results, &QListWidget::itemActivated,
+            this, &Main_Window::openCurrentSearchResult);
 }
 
 void Main_Window::openDatabase(const QString & path)
@@ -69,5 +74,15 @@ void Main_Window::search()
 
     d_search_results->set_search_result(results);
 }
+
+void Main_Window::openCurrentSearchResult()
+{
+    auto path = d_search_results->path(d_search_results->currentItem());
+
+    qDebug() << path;
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
+
 
 }

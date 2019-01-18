@@ -8,11 +8,23 @@ void Search_Result_View::set_search_result(const Search_Result & result)
 
     for(auto & doc : result.documents())
     {
+        QString title;
         if (!doc.title().empty())
-            addItem(QString::fromStdString(doc.title()));
+            title = QString::fromStdString(doc.title());
         else
-            addItem(QString::fromStdString(doc.path()));
+            title = QString::fromStdString(doc.path());
+
+        auto item = new QListWidgetItem;
+        item->setText(title);
+        item->setData(Qt::UserRole, QString::fromStdString(doc.path()));
+
+        addItem(item);
     }
+}
+
+QString Search_Result_View::path(QListWidgetItem* item)
+{
+    return item->data(Qt::UserRole).toString();
 }
 
 }

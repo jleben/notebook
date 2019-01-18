@@ -11,6 +11,7 @@ class Search_Result_View : public QListWidget
 {
 public:
     void set_search_result(const Search_Result &);
+    QString path(QListWidgetItem*);
 };
 
 }

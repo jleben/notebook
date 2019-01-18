@@ -17,6 +17,7 @@ public:
     Main_Window();
 
     void openDatabase(const QString & path);
+    void openCurrentSearchResult();
 
 private:
     void search();
