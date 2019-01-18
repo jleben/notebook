@@ -1,4 +1,5 @@
 #include "index_markdown.h"
+#include "document.h"
 
 #include <fstream>
 #include <iostream>
@@ -35,7 +36,9 @@ void index_markdown(const string & file_path, Xapian::WritableDatabase & db)
 
     ifstream input(file_path);
 
-    std::regex header_start_regx("^\\s*(#+)\\s+.");
+    std::regex header_regx("^\\s*(#+)\\s+(.+)");
+
+    string first_header;
 
     string line;
     while(std::getline(input, line))
@@ -46,11 +49,20 @@ void index_markdown(const string & file_path, Xapian::WritableDatabase & db)
             continue;
         }
 
-        std::smatch header_start_match;
+        std::smatch header_match;
 
-        if (regex_search(line, header_start_match, header_start_regx))
+        if (regex_search(line, header_match, header_regx))
         {
-            int level = header_start_match.length(1);
+            cout << endl << line << endl;
+            cout << "Prefix: " << header_match.str(1) << endl;
+            cout << "Text: " << header_match.str(2) << endl;
+
+            if (first_header.empty())
+            {
+                first_header = header_match.str(2);
+            }
+
+            int level = header_match.length(1);
             int weight = std::max(1, 100 / level);
 
             cout << "Header weight: " << weight << endl;
@@ -65,7 +77,12 @@ void index_markdown(const string & file_path, Xapian::WritableDatabase & db)
     }
 
 
-    doc.add_value(0, file_path);
+    doc.add_value(Notebook::Document::Path, file_path);
+
+    if (!first_header.empty())
+    {
+        doc.add_value(Notebook::Document::Title, first_header);
+    }
 
     cout << "Storing document with id: " << id << endl;
 
