@@ -36,17 +36,17 @@ Main_Window::Main_Window()
             this, &Main_Window::openCurrentSearchResult);
 }
 
-void Main_Window::openDatabase(const QString & path)
+void Main_Window::openDatabase(const QString & index_path, const QString & doc_path)
 {
     try
     {
-        d_db = new Database(path, QString());
+        d_db = new Database(index_path, doc_path, this);
     }
     catch (Xapian::Error & e)
     {
         QString msg;
         msg += "Failed to open database at\n";
-        msg += path;
+        msg += index_path + " : " + doc_path;
         msg += "\n\nReason: ";
         msg += QString::fromStdString(e.get_msg());
 
@@ -56,6 +56,8 @@ void Main_Window::openDatabase(const QString & path)
     }
 
     connect(d_db, &Database::searchFinished, this, &Main_Window::onSearchFinished);
+
+    d_db->fullReindex();
 }
 
 void Main_Window::search()

@@ -15,13 +15,14 @@ class Database : public QObject
     Q_OBJECT
 
 public:
-    Database(const QString & index_path, const QString & docs_path);
+    Database(const QString & index_path, const QString & docs_path, QObject * parent = nullptr);
     ~Database();
 
     QString index_path() const { return d_index_path; }
     QString docs_path() const { return d_docs_path; }
 
     void search(const QString & query);
+    void fullReindex();
 
 signals:
     void searchFinished(Search_Result);
@@ -41,10 +42,12 @@ class Database_Worker : public QObject
 
 public:
     Database_Worker(Database * db);
+    ~Database_Worker();
 
     enum Event_Type
     {
-        Search_Request_Event = QEvent::User
+        Search_Request_Event = QEvent::User,
+        Full_Index_Request_Event
     };
 
     struct Search_Request : public QEvent
@@ -54,15 +57,22 @@ public:
         QString query_text;
     };
 
+    struct Full_Index_Request : public QEvent
+    {
+        Full_Index_Request():
+            QEvent((QEvent::Type)Full_Index_Request_Event) {}
+    };
+
 signals:
     void searchFinished(Search_Result);
 
 private:
     void customEvent(QEvent *);
     void search(const Search_Request &);
+    void fullReindex();
 
     Database * d_db = nullptr;
-    Xapian::Database d_xdb;
+    Xapian::WritableDatabase d_xdb;
 };
 
 }

@@ -17,7 +17,7 @@ class Main_Window : public QWidget
 public:
     Main_Window();
 
-    void openDatabase(const QString & path);
+    void openDatabase(const QString & index_path, const QString & doc_path);
     void openCurrentSearchResult();
 
 private:

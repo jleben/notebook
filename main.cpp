@@ -13,9 +13,9 @@ int main(int argc, char *argv[])
 
     Main_Window win;
 
-    if (app.arguments().size() >= 2)
+    if (app.arguments().size() >= 3)
     {
-        win.openDatabase(app.arguments()[1]);
+        win.openDatabase(app.arguments()[1], app.arguments()[2]);
     }
 
     win.show();

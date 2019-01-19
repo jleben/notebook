@@ -12,11 +12,10 @@ set(CMAKE_AUTOUIC ON)
 # Find the QtWidgets library
 find_package(Qt5Widgets CONFIG REQUIRED)
 
-add_executable(notebook-index proto-index.cpp index_markdown.cpp)
-add_executable(notebook-search proto-search.cpp)
-
-target_link_libraries(notebook-index xapian)
-target_link_libraries(notebook-search xapian)
+#add_executable(notebook-index proto-index.cpp index_markdown.cpp)
+#add_executable(notebook-search proto-search.cpp)
+#target_link_libraries(notebook-index xapian)
+#target_link_libraries(notebook-search xapian)
 
 add_executable(notebook
     main.cpp
@@ -24,6 +23,7 @@ add_executable(notebook
     search_results_view.cpp
     search.cpp
     database.cpp
+    document.cpp
     index_markdown.cpp
 )
 set_property(TARGET notebook PROPERTY CXX_STANDARD 17)
