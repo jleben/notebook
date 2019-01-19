@@ -40,7 +40,7 @@ void Main_Window::openDatabase(const QString & path)
 {
     try
     {
-        d_db = Xapian::Database(path.toStdString());
+        d_db = new Database(path, QString());
     }
     catch (Xapian::Error & e)
     {
@@ -51,19 +51,20 @@ void Main_Window::openDatabase(const QString & path)
         msg += QString::fromStdString(e.get_msg());
 
         QMessageBox::critical(this, "Open Database", msg);
+
+        return;
     }
+
+    connect(d_db, &Database::searchFinished, this, &Main_Window::onSearchFinished);
 }
 
 void Main_Window::search()
 {
-    // FIXME: Check if database open.
-
-    if (d_query_input->text().isEmpty())
-    {
-        d_search_results->clear();
+    if (!d_db)
         return;
-    }
 
+    d_db->search(d_query_input->text());
+#if 0
     string query_source = d_query_input->text().toStdString();
 
     Xapian::QueryParser query_parser;
@@ -73,6 +74,14 @@ void Main_Window::search()
     auto results = Notebook::search(d_db, query);
 
     d_search_results->set_search_result(results);
+#endif
+}
+
+void Main_Window::onSearchFinished(Search_Result result)
+{
+    qDebug() << "Search finished.";
+
+    d_search_results->set_search_result(result);
 }
 
 void Main_Window::openCurrentSearchResult()

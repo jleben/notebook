@@ -23,6 +23,7 @@ add_executable(notebook
     main_win.cpp
     search_results_view.cpp
     search.cpp
+    database.cpp
     index_markdown.cpp
 )
 set_property(TARGET notebook PROPERTY CXX_STANDARD 17)

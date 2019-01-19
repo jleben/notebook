@@ -1,4 +1,5 @@
 #include "main_win.h"
+#include "search.h"
 
 #include <QApplication>
 
@@ -7,6 +8,8 @@ using namespace Notebook;
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    qRegisterMetaType<Notebook::Search_Result>("Search_Result");
 
     Main_Window win;
 

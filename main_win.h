@@ -1,6 +1,7 @@
 #pragma once
 
-#include <xapian.h>
+#include "database.h"
+
 #include <QWidget>
 #include <QLineEdit>
 #include <string>
@@ -21,8 +22,9 @@ public:
 
 private:
     void search();
+    void onSearchFinished(Search_Result result);
 
-    Xapian::Database d_db;
+    Database * d_db = nullptr;
     QLineEdit * d_query_input;
     Search_Result_View * d_search_results;
 };

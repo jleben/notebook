@@ -3,6 +3,7 @@
 #include <xapian.h>
 #include <string>
 #include <vector>
+#include <QMetaType>
 
 namespace Notebook {
 
@@ -31,6 +32,7 @@ private:
 class Search_Result
 {
 public:
+    Search_Result() {}
     Search_Result(vector<Found_Document> docs): d_docs(docs) {}
     const vector<Found_Document> & documents() const { return d_docs; }
 
@@ -41,3 +43,5 @@ private:
 Search_Result search(Xapian::Database & db, Xapian::Query & query, int max_results = 100);
 
 }
+
+Q_DECLARE_METATYPE(Notebook::Search_Result);
