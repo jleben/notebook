@@ -4,6 +4,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QMainWindow>
 #include <string>
 
 namespace Notebook {
@@ -11,7 +12,7 @@ namespace Notebook {
 class Search_Result_View;
 class Note_Editor;
 
-class Main_Window : public QWidget
+class Main_Window : public QMainWindow
 {
     Q_OBJECT
 
@@ -21,7 +22,11 @@ public:
     void openDatabase(const QString & index_path, const QString & doc_path);
     void openCurrentSearchResult();
 
+public slots:
+    void openDatabase();
+
 private:
+    void setupMenu();
     void search();
     void onSearchFinished(Search_Result result);
 

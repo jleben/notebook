@@ -12,6 +12,8 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QMenuBar>
+#include <QMenu>
 
 #include <sstream>
 
@@ -21,7 +23,9 @@ namespace Notebook {
 
 Main_Window::Main_Window()
 {
-    auto layout = new QHBoxLayout(this);
+    auto widget = new QWidget;
+
+    auto layout = new QHBoxLayout(widget);
 
     auto search_layout = new QVBoxLayout;
 
@@ -38,10 +42,46 @@ Main_Window::Main_Window()
     layout->addLayout(search_layout, 1);
     layout->addWidget(d_note_editor, 3);
 
+    setCentralWidget(widget);
+
     connect(d_query_input, &QLineEdit::editingFinished,
             this, &Main_Window::search);
     connect(d_search_results, &QListWidget::itemActivated,
             this, &Main_Window::openCurrentSearchResult);
+
+    setupMenu();
+}
+
+void Main_Window::setupMenu()
+{
+    auto menu_bar = new QMenuBar;
+
+    {
+        auto menu = menu_bar->addMenu("File");
+
+        {
+            auto action = menu->addAction("Open");
+            connect(action, SIGNAL(triggered()),
+                    this, SLOT(openDatabase()));
+        }
+
+        menu->addSeparator();
+
+        {
+            auto action = menu->addAction("&Quit");
+            connect(action, SIGNAL(triggered()),
+                    this, SLOT(close()));
+            action->setShortcut(QKeySequence::Quit);
+        }
+
+    }
+
+    setMenuBar(menu_bar);
+}
+
+void Main_Window::openDatabase()
+{
+
 }
 
 void Main_Window::openDatabase(const QString & index_path, const QString & doc_path)
