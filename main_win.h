@@ -9,6 +9,7 @@
 namespace Notebook {
 
 class Search_Result_View;
+class Note_Editor;
 
 class Main_Window : public QWidget
 {
@@ -25,8 +26,9 @@ private:
     void onSearchFinished(Search_Result result);
 
     Database * d_db = nullptr;
-    QLineEdit * d_query_input;
-    Search_Result_View * d_search_results;
+    QLineEdit * d_query_input = nullptr;
+    Search_Result_View * d_search_results = nullptr;
+    Note_Editor * d_note_editor = nullptr;
 };
 
 }

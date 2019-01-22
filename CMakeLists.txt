@@ -21,6 +21,7 @@ add_executable(notebook
     main.cpp
     main_win.cpp
     search_results_view.cpp
+    note_editor.cpp
     search.cpp
     database.cpp
     document.cpp

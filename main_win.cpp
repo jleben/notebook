@@ -1,6 +1,7 @@
 #include "main_win.h"
 #include "search_results_view.h"
 #include "search.h"
+#include "note_editor.h"
 
 #include <xapian.h>
 
@@ -20,15 +21,22 @@ namespace Notebook {
 
 Main_Window::Main_Window()
 {
-    auto layout = new QVBoxLayout(this);
+    auto layout = new QHBoxLayout(this);
+
+    auto search_layout = new QVBoxLayout;
 
     d_query_input = new QLineEdit;
     d_query_input->setPlaceholderText("Search...");
 
     d_search_results = new Search_Result_View;
 
-    layout->addWidget(d_query_input);
-    layout->addWidget(d_search_results);
+    d_note_editor = new Note_Editor;
+
+    search_layout->addWidget(d_query_input);
+    search_layout->addWidget(d_search_results);
+
+    layout->addLayout(search_layout, 1);
+    layout->addWidget(d_note_editor, 3);
 
     connect(d_query_input, &QLineEdit::editingFinished,
             this, &Main_Window::search);

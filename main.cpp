@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
         win.openDatabase(app.arguments()[1], app.arguments()[2]);
     }
 
-    win.show();
+    win.showMaximized();
 
     int status = app.exec();
 
