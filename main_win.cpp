@@ -2,6 +2,7 @@
 #include "search_results_view.h"
 #include "search.h"
 #include "note_editor.h"
+#include "markdown_document.h"
 
 #include <xapian.h>
 
@@ -14,7 +15,9 @@
 #include <QUrl>
 #include <QMenuBar>
 #include <QMenu>
+#include <QFileDialog>
 
+#include <fstream>
 #include <sstream>
 
 using namespace std;
@@ -60,9 +63,15 @@ void Main_Window::setupMenu()
         auto menu = menu_bar->addMenu("File");
 
         {
-            auto action = menu->addAction("Open");
+            auto action = menu->addAction("Open...");
             connect(action, SIGNAL(triggered()),
                     this, SLOT(openDatabase()));
+        }
+
+        {
+            auto action = menu->addAction("Save As...");
+            connect(action, SIGNAL(triggered()),
+                    this, SLOT(saveCurrentDocumentAs()));
         }
 
         menu->addSeparator();
@@ -140,8 +149,47 @@ void Main_Window::openCurrentSearchResult()
 
     qDebug() << path;
 
-    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    if (path.endsWith(".md"))
+    {
+        ifstream input(path.toStdString());
+        if (!input.is_open())
+        {
+            QMessageBox::critical(this, "Open Document", "Failed to open file.");
+            return;
+        }
+
+        auto doc = markdown_to_document(input);
+
+        d_note_editor->setDocument(doc);
+    }
+    //QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 
+void Main_Window::saveCurrentDocumentAs()
+{
+    QString path = QFileDialog::getSaveFileName(this, "Save As...", "", "*.html,*.md");
+
+    if (path.endsWith(".html"))
+    {
+        ofstream output(path.toStdString());
+        if (!output.is_open())
+        {
+            QMessageBox::critical(this, "Save As...", "Failed to open output file.");
+            return;
+        }
+
+        auto html = d_note_editor->toHtml().toStdString();
+        output.write(html.data(), html.size());
+        if (!output)
+        {
+            QMessageBox::critical(this, "Save As...", "Something went wrong while saving file.");
+            return;
+        }
+    }
+    else
+    {
+        QMessageBox::critical(this, "Save As...", "Selected file format not supported.");
+    }
+}
 
 }
