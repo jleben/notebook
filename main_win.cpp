@@ -160,7 +160,7 @@ void Main_Window::openCurrentSearchResult()
 
         auto doc = markdown_to_document(input);
 
-        d_note_editor->setDocument(doc);
+        //d_note_editor->setDocument(doc);
     }
     //QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
@@ -178,7 +178,8 @@ void Main_Window::saveCurrentDocumentAs()
             return;
         }
 
-        auto html = d_note_editor->toHtml().toStdString();
+        //auto html = d_note_editor->toHtml().toStdString();
+        string html;
         output.write(html.data(), html.size());
         if (!output)
         {
