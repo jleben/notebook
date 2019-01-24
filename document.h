@@ -47,7 +47,7 @@ public:
 
     int cursorPosAtPoint(const QPoint &);
     int cursorPos() const { return d_cursor_pos; }
-    void setCursorPos(int pos) { d_cursor_pos = pos; }
+    void setCursorPos(int pos, int selection_size = 0);
     int previousCursorPos(int pos);
     int nextCursorPos(int pos);
 
@@ -74,6 +74,7 @@ private:
     double d_height = 0;
 
     int d_cursor_pos = -1;
+    int d_selection_size = 0;
 };
 
 class Document

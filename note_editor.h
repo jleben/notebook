@@ -15,6 +15,7 @@ public:
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent*);
     virtual void wheelEvent(QWheelEvent *);
     virtual void paintEvent(QPaintEvent*);
@@ -29,6 +30,8 @@ private:
     Document * d_doc = nullptr;
     int d_scroll_y = 0;
     Document::Element_Iterator d_current_elem;
+
+    int d_selection_start = 0;
 };
 
 }

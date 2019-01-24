@@ -52,8 +52,39 @@ void Note_Editor::mousePressEvent(QMouseEvent *event)
         auto elemPoint = docPoint - pos.toPoint();
         int cursorPos = te->cursorPosAtPoint(elemPoint);
         te->setCursorPos(cursorPos);
+        d_selection_start = cursorPos;
         cout << "Clicked element. Cursor pos = " << cursorPos << endl;
     }
+
+    update();
+}
+
+void Note_Editor::mouseMoveEvent(QMouseEvent *event)
+{
+    auto te = currentTextElement();
+    if (!te)
+        return;
+
+    if (d_selection_start < 0)
+        return;
+
+    auto docPoint = event->pos() + QPoint(0, d_scroll_y);
+
+    auto [elem, pos] = d_doc->elementAt(docPoint);
+    {}{} // This fixes following auto-indentation in Qt Creator.
+    if (elem != d_current_elem)
+        return;
+
+    auto elemPoint = docPoint - pos.toPoint();
+
+    int selection_end = te->cursorPosAtPoint(elemPoint);
+
+    int s = std::min(d_selection_start, selection_end);
+    int l = std::abs(d_selection_start - selection_end);
+
+    cout << "Setting cursor: " << s << " + " << l << endl;
+
+    te->setCursorPos(s, l);
 
     update();
 }

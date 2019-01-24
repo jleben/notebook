@@ -63,9 +63,6 @@ int Text_Element::cursorPosAtPoint(const QPoint & point)
 
     QPointF relPoint = QPointF(point) - d_layout.position();
 
-    if (!d_layout.boundingRect().contains(relPoint))
-        return -1;
-
     for (int i = 0; i < d_layout.lineCount(); ++i)
     {
         auto line = d_layout.lineAt(i);
@@ -76,6 +73,12 @@ int Text_Element::cursorPosAtPoint(const QPoint & point)
     }
 
     return -1;
+}
+
+void Text_Element::setCursorPos(int pos, int selection_size)
+{
+    d_cursor_pos = pos;
+    d_selection_size = selection_size;
 }
 
 int Text_Element::previousCursorPos(int pos)
@@ -95,6 +98,8 @@ int Text_Element::nextCursorPos(int pos)
 void Text_Element::moveCursor(Cursor_Direction dir)
 {
     updateLayout();
+
+    d_selection_size = 0;
 
     if (!d_layout.isValidCursorPosition(d_cursor_pos))
         return;
@@ -169,7 +174,17 @@ void Text_Element::draw(QPainter * painter, const QPointF & position)
 {
     updateLayout();
 
-    d_layout.draw(painter, position);
+    QVector<QTextLayout::FormatRange> selections;
+    if (d_cursor_pos >= 0 && d_selection_size > 0)
+    {
+        QTextLayout::FormatRange selection;
+        selection.start = d_cursor_pos;
+        selection.length = d_selection_size;
+        selection.format.setBackground(Qt::blue);
+        selections.push_back(selection);
+    }
+
+    d_layout.draw(painter, position, selections);
 
     if (d_cursor_pos >= 0)
     {
