@@ -28,6 +28,16 @@ class Text_Element : public Document_Element
 public:
     Text_Element(Document *);
 
+    enum Cursor_Direction
+    {
+        Cursor_Left_Char,
+        Cursor_Right_Char,
+        Cursor_Previous_Char,
+        Cursor_Next_Char,
+        Cursor_Start,
+        Cursor_End
+    };
+
     QString text() const { return d_text; }
     void setText(const QString & text);
     int insertText(int pos, const QString & text);
@@ -40,6 +50,8 @@ public:
     void setCursorPos(int pos) { d_cursor_pos = pos; }
     int previousCursorPos(int pos);
     int nextCursorPos(int pos);
+
+    void moveCursor(Cursor_Direction);
 
     void setFontSize(float size);
 

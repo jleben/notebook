@@ -77,7 +77,31 @@ void Note_Editor::keyPressEvent(QKeyEvent * event)
         ++elem_pos;
         d_current_elem = d_doc->insertParagraph("", elem_pos);
 
+        {
+            currentTextElement()->setCursorPos(0);
+        }
+
         update();
+        return;
+    }
+    case Qt::Key_Left:
+    {
+        moveCursor(Text_Element::Cursor_Left_Char);
+        return;
+    }
+    case Qt::Key_Right:
+    {
+        moveCursor(Text_Element::Cursor_Right_Char);
+        return;
+    }
+    case Qt::Key_Home:
+    {
+        moveCursor(Text_Element::Cursor_Start);
+        return;
+    }
+    case Qt::Key_End:
+    {
+        moveCursor(Text_Element::Cursor_End);
         return;
     }
     case Qt::Key_Backspace:
@@ -115,6 +139,26 @@ void Note_Editor::keyPressEvent(QKeyEvent * event)
     }
 }
 
+void Note_Editor::moveCursor(Text_Element::Cursor_Direction dir)
+{
+    auto te = currentTextElement();
+    if (!te)
+        return;
+
+    te->moveCursor(dir);
+
+    update();
+}
+
+void Note_Editor::wheelEvent(QWheelEvent *event)
+{
+    float offset = logicalDpiY() * 0.2f * event->angleDelta().y() / 120.0f;
+    d_scroll_y = std::max(0.f, d_scroll_y - offset);
+    cout << "Scroll: " << offset << " -> " << d_scroll_y << endl;
+
+    update();
+}
+
 void Note_Editor::resizeEvent(QResizeEvent*)
 {
     d_doc->setWidth(width());
@@ -127,7 +171,7 @@ void Note_Editor::paintEvent(QPaintEvent * event)
 
     painter.fillRect(rect(), Qt::white);
 
-    d_doc->draw(&painter, QPointF(0,0));
+    d_doc->draw(&painter, QPointF(0,-d_scroll_y));
 
     //painter.drawText(rect(), Qt::TextWordWrap, d_text);
 }

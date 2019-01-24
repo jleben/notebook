@@ -91,6 +91,37 @@ int Text_Element::nextCursorPos(int pos)
     return d_layout.nextCursorPosition(pos);
 }
 
+void Text_Element::moveCursor(Cursor_Direction dir)
+{
+    if (d_layout_update_needed)
+        updateLayout();
+
+    if (!d_layout.isValidCursorPosition(d_cursor_pos))
+        return;
+
+    switch(dir)
+    {
+    case Cursor_Left_Char:
+        d_cursor_pos = d_layout.leftCursorPosition(d_cursor_pos);
+        break;
+    case Cursor_Right_Char:
+        d_cursor_pos = d_layout.rightCursorPosition(d_cursor_pos);
+        break;
+    case Cursor_Previous_Char:
+        d_cursor_pos = d_layout.previousCursorPosition(d_cursor_pos);
+        break;
+    case Cursor_Next_Char:
+        d_cursor_pos = d_layout.nextCursorPosition(d_cursor_pos);
+        break;
+     case Cursor_Start:
+        d_cursor_pos = 0;
+        break;
+    case Cursor_End:
+        d_cursor_pos = d_text.size();
+        break;
+    }
+}
+
 void Text_Element::updateLayout()
 {
     {
@@ -142,13 +173,6 @@ void Text_Element::draw(QPainter * painter, const QPointF & position)
     {
         d_layout.drawCursor(painter, position, d_cursor_pos, 2);
     }
-#if 0
-    auto line = d_layout.lineForTextPosition(d_cursor_pos);
-    if (line.isValid())
-    {
-
-    }
-#endif
 }
 
 string Document::id_from_path(const string & path)
