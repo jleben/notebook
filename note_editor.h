@@ -24,9 +24,10 @@ private:
     Text_Element * currentTextElement();
 
     void moveCursor(Text_Element::Cursor_Direction);
+    void normalizeScroll();
 
     Document * d_doc = nullptr;
-    float d_scroll_y = 0;
+    int d_scroll_y = 0;
     Document::Element_Iterator d_current_elem;
 };
 

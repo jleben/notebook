@@ -59,6 +59,8 @@ public:
     virtual int height();
     virtual void draw(QPainter *, const QPointF & position);
 
+    void requestUpdateLayout();
+
 private:
     void updateLayout();
 
@@ -92,6 +94,8 @@ public:
     Element_Iterator insertParagraph(const QString & text, Element_Iterator pos);
 
     void setWidth(int width);
+    int height();
+
     void draw(QPainter *, const QPointF & position);
     QFont font() const { return d_font; }
 
@@ -105,11 +109,18 @@ public:
 
     pair<Element_Iterator, QPointF> elementAt(const QPointF & pos);
 
+    void requestUpdateLayout() { d_layout_update_needed = true; }
+
 private:
+    void updateLayout();
+
     list<Document_Element*> d_elements;
     QFont d_font;
     int d_width = 0;
     int d_spacing = 30;
+
+    bool d_layout_update_needed = true;
+    int d_height = 0;
 };
 
 }

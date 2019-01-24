@@ -150,10 +150,27 @@ void Note_Editor::moveCursor(Text_Element::Cursor_Direction dir)
     update();
 }
 
+void Note_Editor::normalizeScroll()
+{
+    int max_y = std::max(0, d_doc->height() - height());
+    int y = std::max(0, std::min(max_y, d_scroll_y));
+
+    if (y != d_scroll_y)
+    {
+        d_scroll_y = y;
+        update();
+    }
+}
+
+
 void Note_Editor::wheelEvent(QWheelEvent *event)
 {
-    float offset = logicalDpiY() * 0.2f * event->angleDelta().y() / 120.0f;
-    d_scroll_y = std::max(0.f, d_scroll_y - offset);
+    int offset = logicalDpiY() * 0.2f * event->angleDelta().y() / 120.0f;
+
+    d_scroll_y -= offset;
+
+    normalizeScroll();
+
     cout << "Scroll: " << offset << " -> " << d_scroll_y << endl;
 
     update();
@@ -162,6 +179,9 @@ void Note_Editor::wheelEvent(QWheelEvent *event)
 void Note_Editor::resizeEvent(QResizeEvent*)
 {
     d_doc->setWidth(width());
+
+    normalizeScroll();
+
     update();
 }
 
@@ -171,9 +191,7 @@ void Note_Editor::paintEvent(QPaintEvent * event)
 
     painter.fillRect(rect(), Qt::white);
 
-    d_doc->draw(&painter, QPointF(0,-d_scroll_y));
-
-    //painter.drawText(rect(), Qt::TextWordWrap, d_text);
+    d_doc->draw(&painter, QPointF(0, -d_scroll_y));
 }
 
 }

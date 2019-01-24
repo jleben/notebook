@@ -11,16 +11,22 @@ Text_Element::Text_Element(Document * doc):
 
 }
 
+void Text_Element::requestUpdateLayout()
+{
+    d_layout_update_needed = true;
+    d_doc->requestUpdateLayout();
+}
+
 void Text_Element::setWidth(int width)
 {
     d_width = width;
-    d_layout_update_needed = true;
+    requestUpdateLayout();
 }
 
 void Text_Element::setText(const QString & text)
 {
     d_text = text;
-    d_layout_update_needed = true;
+    requestUpdateLayout();
 }
 
 int Text_Element::insertText(int pos, const QString & text)
@@ -29,34 +35,31 @@ int Text_Element::insertText(int pos, const QString & text)
         return -1;
 
     d_text.insert(pos, text);
-    d_layout_update_needed = true;
+    requestUpdateLayout();
     return pos + text.size();
 }
 
 void Text_Element::removeText(int start, int length)
 {
     d_text.remove(start, length);
-    d_layout_update_needed = true;
+    requestUpdateLayout();
 }
 
 void Text_Element::setFontSize(float size)
 {
     d_font_size = size;
-    d_layout_update_needed = true;
+    requestUpdateLayout();
 }
 
 int Text_Element::height()
 {
-    if (d_layout_update_needed)
-        updateLayout();
-
+    updateLayout();
     return d_height;
 }
 
 int Text_Element::cursorPosAtPoint(const QPoint & point)
 {
-    if (d_layout_update_needed)
-        updateLayout();
+    updateLayout();
 
     QPointF relPoint = QPointF(point) - d_layout.position();
 
@@ -77,24 +80,21 @@ int Text_Element::cursorPosAtPoint(const QPoint & point)
 
 int Text_Element::previousCursorPos(int pos)
 {
-    if (d_layout_update_needed)
-        updateLayout();
+    updateLayout();
 
     return d_layout.previousCursorPosition(pos);
 }
 
 int Text_Element::nextCursorPos(int pos)
 {
-    if (d_layout_update_needed)
-        updateLayout();
+    updateLayout();
 
     return d_layout.nextCursorPosition(pos);
 }
 
 void Text_Element::moveCursor(Cursor_Direction dir)
 {
-    if (d_layout_update_needed)
-        updateLayout();
+    updateLayout();
 
     if (!d_layout.isValidCursorPosition(d_cursor_pos))
         return;
@@ -124,6 +124,9 @@ void Text_Element::moveCursor(Cursor_Direction dir)
 
 void Text_Element::updateLayout()
 {
+    if (!d_layout_update_needed)
+        return;
+
     {
         auto f = d_doc->font();
         if (d_font_size > 0)
@@ -164,8 +167,7 @@ void Text_Element::updateLayout()
 
 void Text_Element::draw(QPainter * painter, const QPointF & position)
 {
-    if (d_layout_update_needed)
-        updateLayout();
+    updateLayout();
 
     d_layout.draw(painter, position);
 
@@ -188,6 +190,30 @@ void Document::setWidth(int width)
     {
         elem->setWidth(width);
     }
+}
+
+void Document::updateLayout()
+{
+    if (!d_layout_update_needed)
+        return;
+
+    int height = 0;
+    for (auto * elem : d_elements)
+    {
+        if (height > 0)
+            height += d_spacing;
+
+        height += elem->height();
+    }
+    d_height = height;
+
+    d_layout_update_needed = false;
+}
+
+int Document::height()
+{
+    updateLayout();
+    return d_height;
 }
 
 Document::Element_Iterator Document::insertHeading(const QString & text, Element_Iterator pos)
