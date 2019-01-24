@@ -64,8 +64,8 @@ public:
 
     static string id_from_path(const string & path);
 
-    void insertHeading(const QString & text);
-    void insertParagraph(const QString & text);
+    Element_Iterator insertHeading(const QString & text, Element_Iterator pos);
+    Element_Iterator insertParagraph(const QString & text, Element_Iterator pos);
 
     void setWidth(int width);
     void draw(QPainter *, const QPointF & position);

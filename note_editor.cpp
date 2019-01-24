@@ -15,8 +15,9 @@ Note_Editor::Note_Editor(QWidget * parent):
     d_doc = new Document;
     d_current_elem = d_doc->end();
 
-    d_doc->insertHeading("hohoho.");
-    d_doc->insertParagraph("hahaha ha ha ha hahaha ha ha ha hahaha ha hohoho ho ho ho ho hohoho ho!");
+    d_doc->insertHeading("hohoho.", d_doc->end());
+    d_doc->insertParagraph("hahaha ha ha ha hahaha ha ha ha hahaha ha hohoho ho ho ho ho hohoho ho!",
+                           d_doc->end());
 }
 
 void Note_Editor::mousePressEvent(QMouseEvent *event)
@@ -30,7 +31,12 @@ void Note_Editor::keyPressEvent(QKeyEvent * event)
     case Qt::Key_Enter:
     case Qt::Key_Return:
     {
-        d_doc->insertParagraph("");
+        if (d_current_elem == d_doc->end())
+            return;
+
+        auto pos = d_current_elem;
+        ++pos;
+        d_current_elem = d_doc->insertParagraph("", pos);
         update();
         return;
     }

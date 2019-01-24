@@ -107,23 +107,23 @@ void Document::setWidth(int width)
     }
 }
 
-void Document::insertHeading(const QString & text)
+Document::Element_Iterator Document::insertHeading(const QString & text, Element_Iterator pos)
 {
     auto elem = new Text_Element(this);
     elem->setText(text);
     elem->setFontSize(d_font.pointSizeF() * 2);
     elem->setWidth(d_width);
 
-    d_elements.push_back(elem);
+    return d_elements.insert(pos, elem);
 }
 
-void Document::insertParagraph(const QString & text)
+Document::Element_Iterator Document::insertParagraph(const QString & text, Element_Iterator pos)
 {
     auto elem = new Text_Element(this);
     elem->setText(text);
     elem->setWidth(d_width);
 
-    d_elements.push_back(elem);
+    return d_elements.insert(pos, elem);
 }
 
 Document::Element_Iterator Document::elementAt(const QPointF & pos)
