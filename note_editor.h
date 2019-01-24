@@ -20,9 +20,11 @@ protected:
     virtual void resizeEvent(QResizeEvent*);
 
 private:
+    Text_Element * currentTextElement();
+
     Document * d_doc = nullptr;
-    Document::Element_Iterator d_current_elem;
     float d_scroll_y = 0;
+    Document::Element_Iterator d_current_elem;
 };
 
 }

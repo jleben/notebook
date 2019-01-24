@@ -23,10 +23,19 @@ void Text_Element::setText(const QString & text)
     d_layout_update_needed = true;
 }
 
-void Text_Element::insertText(int pos, const QString & text)
+int Text_Element::insertText(int pos, const QString & text)
 {
-    if (pos >= 0 && pos <= d_text.size())
-        d_text.insert(pos, text);
+    if (pos < 0 || pos > d_text.size())
+        return -1;
+
+    d_text.insert(pos, text);
+    d_layout_update_needed = true;
+    return pos + text.size();
+}
+
+void Text_Element::removeText(int start, int length)
+{
+    d_text.remove(start, length);
     d_layout_update_needed = true;
 }
 
@@ -42,6 +51,44 @@ int Text_Element::height()
         updateLayout();
 
     return d_height;
+}
+
+int Text_Element::cursorPosAtPoint(const QPoint & point)
+{
+    if (d_layout_update_needed)
+        updateLayout();
+
+    QPointF relPoint = QPointF(point) - d_layout.position();
+
+    if (!d_layout.boundingRect().contains(relPoint))
+        return -1;
+
+    for (int i = 0; i < d_layout.lineCount(); ++i)
+    {
+        auto line = d_layout.lineAt(i);
+        if (line.y() + line.height() > relPoint.y())
+        {
+            return line.xToCursor(relPoint.x());
+        }
+    }
+
+    return -1;
+}
+
+int Text_Element::previousCursorPos(int pos)
+{
+    if (d_layout_update_needed)
+        updateLayout();
+
+    return d_layout.previousCursorPosition(pos);
+}
+
+int Text_Element::nextCursorPos(int pos)
+{
+    if (d_layout_update_needed)
+        updateLayout();
+
+    return d_layout.nextCursorPosition(pos);
 }
 
 void Text_Element::updateLayout()
@@ -90,6 +137,18 @@ void Text_Element::draw(QPainter * painter, const QPointF & position)
         updateLayout();
 
     d_layout.draw(painter, position);
+
+    if (d_cursor_pos >= 0)
+    {
+        d_layout.drawCursor(painter, position, d_cursor_pos, 2);
+    }
+#if 0
+    auto line = d_layout.lineForTextPosition(d_cursor_pos);
+    if (line.isValid())
+    {
+
+    }
+#endif
 }
 
 string Document::id_from_path(const string & path)
@@ -126,24 +185,24 @@ Document::Element_Iterator Document::insertParagraph(const QString & text, Eleme
     return d_elements.insert(pos, elem);
 }
 
-Document::Element_Iterator Document::elementAt(const QPointF & pos)
+pair<Document::Element_Iterator, QPointF> Document::elementAt(const QPointF & pos)
 {
     if (pos.y() < 0)
-        return end();
+        return { end(), QPointF() };
 
     int elem_y = 0;
 
     for(auto elem_it = begin(); elem_it != end(); ++elem_it)
     {
-        elem_y += (*elem_it)->height();
+        int bottom = elem_y + (*elem_it)->height();
 
-        if (elem_y > pos.y())
-            return elem_it;
+        if (bottom > pos.y())
+            return { elem_it, QPointF(0, elem_y) };
 
-        elem_y += d_spacing;
+        elem_y = bottom + d_spacing;
     }
 
-    return end();
+    return { end(), QPointF() };
 }
 
 void Document::draw(QPainter * painter, const QPointF & position)

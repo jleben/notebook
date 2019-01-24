@@ -5,11 +5,13 @@
 
 #include <string>
 #include <list>
+#include <utility>
 
 namespace Notebook {
 
 using std::string;
 using std::list;
+using std::pair;
 class Document;
 
 class Document_Element
@@ -28,8 +30,16 @@ public:
 
     QString text() const { return d_text; }
     void setText(const QString & text);
-    void insertText(int pos, const QString & text);
+    int insertText(int pos, const QString & text);
+    void removeText(int start, int length);
+
     int length() const { return d_text.size(); }
+
+    int cursorPosAtPoint(const QPoint &);
+    int cursorPos() const { return d_cursor_pos; }
+    void setCursorPos(int pos) { d_cursor_pos = pos; }
+    int previousCursorPos(int pos);
+    int nextCursorPos(int pos);
 
     void setFontSize(float size);
 
@@ -48,6 +58,8 @@ private:
     bool d_layout_update_needed = true;
     double d_width = 0;
     double d_height = 0;
+
+    int d_cursor_pos = -1;
 };
 
 class Document
@@ -79,7 +91,7 @@ public:
     Element_Iterator begin() { return d_elements.begin(); }
     Element_Iterator end() { return d_elements.end(); }
 
-    Element_Iterator elementAt(const QPointF & pos);
+    pair<Element_Iterator, QPointF> elementAt(const QPointF & pos);
 
 private:
     list<Document_Element*> d_elements;
