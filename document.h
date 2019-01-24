@@ -79,10 +79,13 @@ public:
     Element_Iterator begin() { return d_elements.begin(); }
     Element_Iterator end() { return d_elements.end(); }
 
+    Element_Iterator elementAt(const QPointF & pos);
+
 private:
     list<Document_Element*> d_elements;
     QFont d_font;
     int d_width = 0;
+    int d_spacing = 30;
 };
 
 }

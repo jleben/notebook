@@ -126,6 +126,26 @@ void Document::insertParagraph(const QString & text)
     d_elements.push_back(elem);
 }
 
+Document::Element_Iterator Document::elementAt(const QPointF & pos)
+{
+    if (pos.y() < 0)
+        return end();
+
+    int elem_y = 0;
+
+    for(auto elem_it = begin(); elem_it != end(); ++elem_it)
+    {
+        elem_y += (*elem_it)->height();
+
+        if (elem_y > pos.y())
+            return elem_it;
+
+        elem_y += d_spacing;
+    }
+
+    return end();
+}
+
 void Document::draw(QPainter * painter, const QPointF & position)
 {
     QPointF p = position;
@@ -133,7 +153,7 @@ void Document::draw(QPainter * painter, const QPointF & position)
     for (auto * elem : d_elements)
     {
         elem->draw(painter, p);
-        p += QPointF(0, elem->height() + 30);
+        p += QPointF(0, elem->height() + d_spacing);
     }
 }
 

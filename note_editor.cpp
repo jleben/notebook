@@ -13,8 +13,15 @@ Note_Editor::Note_Editor(QWidget * parent):
     setFocusPolicy(Qt::StrongFocus);
 
     d_doc = new Document;
+    d_current_elem = d_doc->end();
+
     d_doc->insertHeading("hohoho.");
     d_doc->insertParagraph("hahaha ha ha ha hahaha ha ha ha hahaha ha hohoho ho ho ho ho hohoho ho!");
+}
+
+void Note_Editor::mousePressEvent(QMouseEvent *event)
+{
+    d_current_elem = d_doc->elementAt(event->pos() + QPoint(0, d_scroll_y));
 }
 
 void Note_Editor::keyPressEvent(QKeyEvent * event)
@@ -32,12 +39,15 @@ void Note_Editor::keyPressEvent(QKeyEvent * event)
         if (event->text().isEmpty())
             return;
 
-        auto e = d_doc->last();
+        if (d_current_elem == d_doc->end())
+            return;
+
+        auto e = *d_current_elem;
         auto p = dynamic_cast<Text_Element*>(e);
-        if (p)
-        {
-            p->insertText(p->length(), event->text());
-        }
+        if (!p)
+            return;
+
+        p->insertText(p->length(), event->text());
 
         update();
         return;
