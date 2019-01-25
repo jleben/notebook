@@ -3,6 +3,10 @@
 
 #include <QFontMetrics>
 
+#include <iostream>
+
+using namespace std;
+
 namespace Notebook {
 
 Text_Element::Text_Element(Document * doc):
@@ -81,20 +85,6 @@ void Text_Element::setCursorPos(int pos, int selection_size)
     d_selection_size = selection_size;
 }
 
-int Text_Element::previousCursorPos(int pos)
-{
-    updateLayout();
-
-    return d_layout.previousCursorPosition(pos);
-}
-
-int Text_Element::nextCursorPos(int pos)
-{
-    updateLayout();
-
-    return d_layout.nextCursorPosition(pos);
-}
-
 void Text_Element::moveCursor(Cursor_Direction dir)
 {
     updateLayout();
@@ -150,15 +140,35 @@ void Text_Element::updateLayout()
 
     d_layout.beginLayout();
 
+    int textPos = 0;
+
     while (1)
     {
         QTextLine line = d_layout.createLine();
         if (!line.isValid())
             break;
 
-        line.setLineWidth(d_width);
-        height += leading;
+        if (d_wrap_lines)
+        {
+            line.setLineWidth(d_width);
+        }
+        else
+        {
+            int lineEndPos = d_text.indexOf('\n', textPos);
+            if (lineEndPos == -1)
+                lineEndPos = d_text.size();
+            else
+                lineEndPos += 1;
 
+            cout << "Unwrapped line: " << textPos << " to " << lineEndPos << endl;
+
+            // FIXME: Column count may not be equal to char count
+            line.setNumColumns(lineEndPos - textPos);
+
+            textPos = lineEndPos;
+        }
+
+        height += leading;
         line.setPosition(QPointF(0, height));
         height += line.height();
     }
@@ -190,6 +200,12 @@ void Text_Element::draw(QPainter * painter, const QPointF & position)
     {
         d_layout.drawCursor(painter, position, d_cursor_pos, 2);
     }
+}
+
+Code_Element::Code_Element(Document * doc):
+    Text_Element(doc)
+{
+    setWrapLines(false);
 }
 
 string Document::id_from_path(const string & path)
@@ -244,6 +260,15 @@ Document::Element_Iterator Document::insertHeading(const QString & text, Element
 Document::Element_Iterator Document::insertParagraph(const QString & text, Element_Iterator pos)
 {
     auto elem = new Text_Element(this);
+    elem->setText(text);
+    elem->setWidth(d_width);
+
+    return d_elements.insert(pos, elem);
+}
+
+Document::Element_Iterator Document::insertCode(const QString & text, Element_Iterator pos)
+{
+    auto elem = new Code_Element(this);
     elem->setText(text);
     elem->setWidth(d_width);
 

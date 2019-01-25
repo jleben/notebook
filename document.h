@@ -48,12 +48,12 @@ public:
     int cursorPosAtPoint(const QPoint &);
     int cursorPos() const { return d_cursor_pos; }
     void setCursorPos(int pos, int selection_size = 0);
-    int previousCursorPos(int pos);
-    int nextCursorPos(int pos);
 
     void moveCursor(Cursor_Direction);
 
     void setFontSize(float size);
+
+    void setWrapLines(bool wrap) { d_wrap_lines = wrap; requestUpdateLayout(); }
 
     virtual void setWidth(int width);
     virtual int height();
@@ -61,7 +61,7 @@ public:
 
     void requestUpdateLayout();
 
-private:
+protected:
     void updateLayout();
 
     Document * d_doc = nullptr;
@@ -70,11 +70,18 @@ private:
 
     QTextLayout d_layout;
     bool d_layout_update_needed = true;
+    bool d_wrap_lines = true;
     double d_width = 0;
     double d_height = 0;
 
     int d_cursor_pos = -1;
     int d_selection_size = 0;
+};
+
+class Code_Element : public Text_Element
+{
+public:
+    Code_Element(Document *);
 };
 
 class Document
@@ -93,6 +100,7 @@ public:
 
     Element_Iterator insertHeading(const QString & text, Element_Iterator pos);
     Element_Iterator insertParagraph(const QString & text, Element_Iterator pos);
+    Element_Iterator insertCode(const QString & text, Element_Iterator pos);
 
     void setWidth(int width);
     int height();

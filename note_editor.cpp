@@ -21,6 +21,8 @@ Note_Editor::Note_Editor(QWidget * parent):
     d_doc->insertHeading("hohoho.", d_doc->end());
     d_doc->insertParagraph("hahaha ha ha ha hahaha ha ha ha hahaha ha hohoho ho ho ho ho hohoho ho!",
                            d_doc->end());
+    d_doc->insertCode("One\nTwo\nThree four five six seven eight nine ten eleven twelve.",
+                      d_doc->end());
 }
 
 Text_Element * Note_Editor::currentTextElement()
@@ -145,9 +147,10 @@ void Note_Editor::keyPressEvent(QKeyEvent * event)
         if (cur < 1)
             return;
 
-        int prev = te->previousCursorPos(cur);
+        te->moveCursor(Text_Element::Cursor_Previous_Char);
+        int prev = te->cursorPos();
+
         te->removeText(prev, cur-prev);
-        te->setCursorPos(prev);
 
         update();
         return;
