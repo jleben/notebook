@@ -26,6 +26,7 @@ private:
 
     void moveCursor(Text_Element::Cursor_Direction);
     void normalizeScroll();
+    void paste();
 
     Document * d_doc = nullptr;
     int d_scroll_y = 0;

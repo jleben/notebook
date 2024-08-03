@@ -4,6 +4,9 @@
 #include <QKeyEvent>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QClipboard>
+#include <QApplication>
+
 #include <iostream>
 
 using namespace std;
@@ -93,6 +96,12 @@ void Note_Editor::mouseMoveEvent(QMouseEvent *event)
 
 void Note_Editor::keyPressEvent(QKeyEvent * event)
 {
+    if (event->matches(QKeySequence::Paste))
+    {
+        paste();
+        return;
+    }
+
     switch (event->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return:
@@ -171,6 +180,23 @@ void Note_Editor::keyPressEvent(QKeyEvent * event)
         return;
     }
     }
+}
+
+void Note_Editor::paste()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    auto text = clipboard->text();
+    if (text.isEmpty())
+        return;
+
+    auto t = currentTextElement();
+    if (!t)
+        return;
+
+    int c = t->insertText(t->cursorPos(), text);
+    t->setCursorPos(c);
+
+    update();
 }
 
 void Note_Editor::moveCursor(Text_Element::Cursor_Direction dir)
